@@ -1,12 +1,11 @@
 // src/services/forumService.js
-
 import api from "./api";
 
 const forumService = {
   getAll: async () => {
     try {
       const response = await api.get("/forums");
-      return response.data;
+      return response.data; //
     } catch (error) {
       console.error("Error fetching forums:", error);
       throw error;
@@ -38,10 +37,11 @@ const forumService = {
 
   update: async (id, data) => {
     try {
-      const response = await api.patch(`/forums/${id}`, {
-        quote: data.quote,
-        author: data.author,
-      });
+      const payload = {};
+      if (data.quote) payload.quote = data.quote;
+      if (data.author) payload.author = data.author;
+
+      const response = await api.patch(`/forums/${id}`, payload);
       return response.data;
     } catch (error) {
       console.error(`Error updating forum ${id}:`, error);

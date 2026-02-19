@@ -363,7 +363,7 @@ const ApplicationList = () => {
                     <td className="px-6 py-4 text-sm text-slate-600 hidden md:table-cell">
                       <div className="flex items-center gap-2">
                         <Calendar size={16} className="text-blue-600" />
-                        <span>{formatDate(application.createdAt)}</span>
+                        <span>{formatDate(application.appliedAt)}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">

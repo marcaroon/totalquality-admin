@@ -11,6 +11,7 @@ import {
   ClipboardList,
   FileText,
   BarChart,
+  MailX,
 } from "lucide-react";
 
 const Sidebar = ({ activeMenu, setActiveMenu, isOpen, setIsOpen }) => {
@@ -24,6 +25,7 @@ const Sidebar = ({ activeMenu, setActiveMenu, isOpen, setIsOpen }) => {
     { id: "applications", label: "Applications", icon: ClipboardList },
     { id: "forum", label: "Forum", icon: MessageSquare },
     { id: "assessments", label: "Assessments", icon: BarChart },
+    { id: "hero", label: "Hero Image", icon: MailX },
   ];
 
   return (

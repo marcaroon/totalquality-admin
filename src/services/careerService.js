@@ -1,12 +1,11 @@
 // src/services/careerService.js
-
 import api from "./api";
 
 const careerService = {
   getAll: async () => {
     try {
       const response = await api.get("/careers");
-      return response.data;
+      return response.data; //
     } catch (error) {
       console.error("Error fetching careers:", error);
       throw error;
@@ -35,7 +34,13 @@ const careerService = {
 
   update: async (id, data) => {
     try {
-      const response = await api.patch(`/careers/${id}`, data);
+      const payload = {};
+      if (data.title) payload.title = data.title;
+      if (data.description) payload.description = data.description;
+      if (data.requirements) payload.requirements = data.requirements;
+      if (data.location) payload.location = data.location;
+
+      const response = await api.patch(`/careers/${id}`, payload);
       return response.data;
     } catch (error) {
       console.error(`Error updating career ${id}:`, error);
@@ -53,36 +58,13 @@ const careerService = {
     }
   },
 
-  toggleStatus: async (id, status) => {
-    try {
-      const response = await api.patch(`/careers/${id}`, { status });
-      return response.data;
-    } catch (error) {
-      console.error(`Error toggling status for career ${id}:`, error);
-      throw error;
-    }
-  },
-
-  getApplications: async (careerId) => {
-    try {
-      const response = await api.get(`/applications/career/${careerId}`);
-      return response.data;
-    } catch (error) {
-      console.error(
-        `Error fetching applications for career ${careerId}:`,
-        error
-      );
-      throw error;
-    }
-  },
-
   getCount: async () => {
     try {
-      const response = await api.get("/careers/count");
-      return response.data.count;
+      const response = await api.get("/careers");
+      return response.data.data.length;
     } catch (error) {
       console.error("Error fetching career count:", error);
-      throw error;
+      return 0;
     }
   },
 };

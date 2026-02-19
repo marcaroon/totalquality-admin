@@ -19,6 +19,7 @@ import CareerList from "./pages/Career/CareerList";
 import ApplicationList from "./pages/Application/ApplicationList";
 import ForumList from "./pages/Forum/ForumList";
 import AssessmentList from "./pages/Assessment/AssessmentList";
+import HeroManager from "./pages/Hero/HeroManager";
 
 function AppContent() {
   const [activeMenu, setActiveMenu] = useState("dashboard");
@@ -55,6 +56,9 @@ function AppContent() {
 
       case "assessments":
         return <AssessmentList />;
+
+      case "hero":
+        return <HeroManager />;
 
       default:
         return <Dashboard />;
