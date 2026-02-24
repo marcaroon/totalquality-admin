@@ -16,16 +16,16 @@ import {
 
 const Sidebar = ({ activeMenu, setActiveMenu, isOpen, setIsOpen }) => {
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: Home },
-    { id: "users", label: "Users", icon: Users },
+    // { id: "dashboard", label: "Dashboard", icon: Home },
+    // { id: "users", label: "Users", icon: Users },
+    { id: "hero", label: "Hero Image", icon: MailX },
     { id: "services", label: "Services", icon: Briefcase },
     { id: "events", label: "Events", icon: Calendar },
-    { id: "news", label: "News", icon: Newspaper },
+    { id: "news", label: "Articles", icon: Newspaper },
     { id: "careers", label: "Careers", icon: FileText },
     { id: "applications", label: "Applications", icon: ClipboardList },
     { id: "forum", label: "Forum", icon: MessageSquare },
     { id: "assessments", label: "Assessments", icon: BarChart },
-    { id: "hero", label: "Hero Image", icon: MailX },
   ];
 
   return (

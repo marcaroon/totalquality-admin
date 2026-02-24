@@ -8,8 +8,6 @@ import {
   Search,
   Grid3x3,
   List,
-  Eye,
-  EyeOff,
   Newspaper,
 } from "lucide-react";
 import newsService from "../../services/newsService";
@@ -23,7 +21,6 @@ const NewsList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
-  const [filterStatus, setFilterStatus] = useState("all"); // all, published, draft
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,9 +56,7 @@ const NewsList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this news?")) {
-      return;
-    }
+    if (!window.confirm("Are you sure you want to delete this news?")) return;
 
     try {
       await newsService.delete(id);
@@ -69,19 +64,6 @@ const NewsList = () => {
       alert("News deleted successfully");
     } catch (err) {
       alert("Failed to delete news");
-      console.error(err);
-    }
-  };
-
-  const handleTogglePublish = async (id, currentStatus) => {
-    try {
-      const updated = await newsService.togglePublish(id, !currentStatus);
-      setNews(news.map((n) => (n.id === id ? updated : n)));
-      alert(
-        `News ${!currentStatus ? "published" : "unpublished"} successfully`
-      );
-    } catch (err) {
-      alert("Failed to update publish status");
       console.error(err);
     }
   };
@@ -124,20 +106,15 @@ const NewsList = () => {
     });
   };
 
-  // Filter news
+  // Filter news by search term only (tidak ada status published di backend)
   const filteredNews = news
     .filter((item) => {
-      const matchesSearch =
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.author?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      if (filterStatus === "published") {
-        return matchesSearch && item.published;
-      } else if (filterStatus === "draft") {
-        return matchesSearch && !item.published;
-      }
-      return matchesSearch;
+      const q = searchTerm.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.content.toLowerCase().includes(q) ||
+        item.author?.toLowerCase().includes(q)
+      );
     })
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -146,7 +123,7 @@ const NewsList = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading news...</p>
+          <p className="mt-4 text-slate-600">Loading articles...</p>
         </div>
       </div>
     );
@@ -157,13 +134,11 @@ const NewsList = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">News</h2>
-          <p className="text-slate-600 mt-1">
-            Manage company news and articles
-          </p>
+          <h2 className="text-2xl font-bold text-slate-800">Articles</h2>
+          <p className="text-slate-600 mt-1">Manage Total Quality's articles</p>
         </div>
         <Button onClick={handleCreate} variant="primary" icon={Plus}>
-          Add News
+          Add Article
         </Button>
       </div>
 
@@ -173,7 +148,7 @@ const NewsList = () => {
         </div>
       )}
 
-      {/* Filters & Search */}
+      {/* Search & View Toggle */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search
@@ -182,59 +157,35 @@ const NewsList = () => {
           />
           <input
             type="text"
-            placeholder="Search news..."
+            placeholder="Search articles..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Filter Status */}
-        <div className="flex gap-2">
-          {["all", "published", "draft"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`
-                px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize
-                ${
-                  filterStatus === status
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }
-              `}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
-
         {/* View Mode Toggle */}
         <div className="flex gap-2">
           <button
             onClick={() => setViewMode("grid")}
-            className={`
-              p-2 rounded-lg transition-colors
+            className={`p-2 rounded-lg transition-colors
               ${
                 viewMode === "grid"
                   ? "bg-blue-600 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }
-            `}
+              }`}
             title="Grid View"
           >
             <Grid3x3 size={20} />
           </button>
           <button
             onClick={() => setViewMode("list")}
-            className={`
-              p-2 rounded-lg transition-colors
+            className={`p-2 rounded-lg transition-colors
               ${
                 viewMode === "list"
                   ? "bg-blue-600 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }
-            `}
+              }`}
             title="List View"
           >
             <List size={20} />
@@ -248,8 +199,8 @@ const NewsList = () => {
           <Newspaper className="w-16 h-16 text-slate-300 mx-auto mb-4" />
           <p className="text-slate-600">
             {searchTerm
-              ? "No news found matching your search"
-              : "No news yet. Create your first article!"}
+              ? "No article found matching your search"
+              : "No article yet. Create your first article!"}
           </p>
         </div>
       ) : viewMode === "grid" ? (
@@ -272,49 +223,26 @@ const NewsList = () => {
               )}
 
               <div className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span
-                    className={`
-                      inline-block px-3 py-1 rounded-full text-xs font-medium
-                      ${
-                        item.published
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }
-                    `}
-                  >
-                    {item.published ? "Published" : "Draft"}
-                  </span>
-                </div>
-
                 <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2">
                   {item.title}
                 </h3>
 
-                <p className="text-slate-600 text-sm mb-3 line-clamp-2">
-                  {item.summary}
+                <p className="text-slate-600 text-sm mb-3 line-clamp-3">
+                  {item.content}
                 </p>
 
                 <div className="text-xs text-slate-500 mb-4">
-                  <div>By {item.author}</div>
+                  {item.author && <div>By {item.author}</div>}
                   <div>{formatDate(item.createdAt)}</div>
                 </div>
 
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => handleTogglePublish(item.id, item.published)}
-                    variant="outline"
-                    size="sm"
-                    icon={item.published ? EyeOff : Eye}
-                    className="flex-1"
-                  >
-                    {item.published ? "Unpublish" : "Publish"}
-                  </Button>
-                  <Button
                     onClick={() => handleEdit(item)}
                     variant="outline"
                     size="sm"
                     icon={Edit}
+                    className="flex-1"
                   >
                     Edit
                   </Button>
@@ -323,6 +251,7 @@ const NewsList = () => {
                     variant="danger"
                     size="sm"
                     icon={Trash2}
+                    className="flex-1"
                   >
                     Delete
                   </Button>
@@ -338,16 +267,13 @@ const NewsList = () => {
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
-                  News
+                  Article
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider hidden lg:table-cell">
                   Author
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider hidden md:table-cell">
                   Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">
-                  Status
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-slate-700 uppercase tracking-wider">
                   Actions
@@ -374,45 +300,19 @@ const NewsList = () => {
                           {item.title}
                         </div>
                         <div className="text-sm text-slate-500 line-clamp-1">
-                          {item.summary}
+                          {item.content}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600 hidden lg:table-cell">
-                    {item.author}
+                    {item.author || "-"}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600 hidden md:table-cell">
                     {formatDate(item.createdAt)}
                   </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`
-                        inline-block px-3 py-1 rounded-full text-xs font-medium
-                        ${
-                          item.published
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }
-                      `}
-                    >
-                      {item.published ? "Published" : "Draft"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm">
+                  <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        onClick={() =>
-                          handleTogglePublish(item.id, item.published)
-                        }
-                        variant="outline"
-                        size="sm"
-                        icon={item.published ? EyeOff : Eye}
-                      >
-                        <span className="hidden sm:inline">
-                          {item.published ? "Unpublish" : "Publish"}
-                        </span>
-                      </Button>
                       <Button
                         onClick={() => handleEdit(item)}
                         variant="outline"
@@ -442,7 +342,7 @@ const NewsList = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title={selectedNews ? "Edit News" : "Add New News"}
+        title={selectedNews ? "Edit Article" : "Add New Article"}
         size="lg"
       >
         <NewsForm

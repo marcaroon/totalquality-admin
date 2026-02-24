@@ -4,10 +4,12 @@ import api from "./api";
 
 const eventService = {
   // Upload image file
-  uploadImage: async (file) => {
+  // folder: "events" untuk headline, bisa juga "events" untuk inline (dibedakan di backend oleh nama folder saja)
+  uploadImage: async (file, folder = "events") => {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", folder);
 
       const response = await api.post("/upload", formData, {
         headers: {
@@ -49,9 +51,8 @@ const eventService = {
     try {
       let imageUrl = data.image;
 
-      // If imageFile exists, upload it first
       if (data.imageFile) {
-        imageUrl = await eventService.uploadImage(data.imageFile);
+        imageUrl = await eventService.uploadImage(data.imageFile, "events");
       }
 
       const response = await api.post("/events", {
@@ -74,9 +75,8 @@ const eventService = {
     try {
       let imageUrl = data.image;
 
-      // If imageFile exists, upload it first
       if (data.imageFile) {
-        imageUrl = await eventService.uploadImage(data.imageFile);
+        imageUrl = await eventService.uploadImage(data.imageFile, "events");
       }
 
       const response = await api.patch(`/events/${id}`, {
